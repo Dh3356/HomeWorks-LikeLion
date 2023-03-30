@@ -74,26 +74,51 @@ const PEOPLE_INFOS = [
   },
   {
     name: '대학원생',
-    type: 'studnet',
+    type: 'student',
     food: '짬뽕',
   },
 ];
 
 // 식권 종이를 출력합니다. 식권 종이에는 이름과 금액이 있어야합니다.
 const getTicket = (peopleName, type, food) => {
-  // 코드 작성
-  // return {name: 이름, price: 내야하는 금액}
-  // return '찾았다 요놈!'
-  // return '그런거 안팔아요'
+  let price = Number(FOODS_PRICE[food]);
+  if(!PEOPLE_TYPE.includes(type))
+  {
+    return '찾았다 요놈!';
+  }
+  if(!(food in FOODS_PRICE))
+  {
+    return '그런거 안팔아요';
+  }
+  
+  switch(type)
+  {
+    case 'student':
+      {
+        price += 100;
+        break;
+      }
+    case 'professor':
+      {
+        price += 500;
+        break;
+      }
+    case 'employee':
+      {
+        price += 300;
+        break;
+      }
+  }
+  return {name: peopleName, price: price}
 };
 
 // 식권 지불 금액을 계산하는 함수를 완성하세요
 const getTickets = (ticketInfos) => {
-  // getTicket 함수를 이용해 PEOPLE_INFOS가 내야하는 식권 정보를 알아내세요
+  let tickets = [];
+  for(let i of ticketInfos)
+  {
+    tickets.push(getTicket(i.name, i.type, i.food));
+  }
+  return tickets;
 };
-
-/*
-  예상 출력
-  ['김멋사: 7100', '배교수: 5500', '임직원: 4300', '찾았다 요놈!', '그런거 안팔아요']
-*/
 console.log(getTickets(PEOPLE_INFOS));
