@@ -84,8 +84,7 @@ const readTodo = () => {
 // 보너스: if문을 쓰지 말고 업데이트 하세요. 단, 에러 처리에는 if문을 써도 됩니다. (힌트: 논리연산자)
 /** @param {{ id: number, title: string, text: string }} targetTodo */
 const updateTodo = (targetTodo) => {
-    let contain = todos.filter(i => i.id === targetTodo.id);
-    if(contain.length === 0)
+    if(todos.filter(i => i.id === targetTodo.id).length === 0)
     {
         return console.log(`id = ${targetTodo.id}에 맞는 todo를 찾을 수 없습니다.updateTodo`);
     }
@@ -96,8 +95,7 @@ const updateTodo = (targetTodo) => {
 // 보너스: filter 함수를 사용해 구현해보세요
 /** @param {number} id */
 const deleteTodo = (id) => {
-    let contain = todos.filter(i => i.id === id);
-    if(contain.length === 0)
+    if(todos.filter(i => i.id === id).length === 0)
     {
         return console.log(`id = ${id}에 맞는 todo를 찾을 수 없습니다.`);
     }
