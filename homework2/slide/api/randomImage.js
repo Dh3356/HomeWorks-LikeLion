@@ -8,7 +8,7 @@ const getRandomImage = async () => {
 
     try{
         const result = await fetch(BASE_URL);//fetch()가 끝날 때 까지 기다렸다가 다음 코드 실행
-        const content = await result.json();//result()가 끝날 때 까지 기다렸다가 다음 코드 실행, 이미지 객체를 10개
+        const content = await result.json();//result()가 끝날 때 까지 기다렸다가 다음 코드 실행
 
         return content;
     }

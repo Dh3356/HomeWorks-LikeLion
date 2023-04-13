@@ -21,7 +21,7 @@ let currentCount = 0;//현재 페이지 번호
 const registButtonEvent = () => {//DOMContentLoaded 됐을 때 실행하는 함수
     randomImageBtn.addEventListener('click', async () => {//randomImage Button click 시 발생하는 이벤트
         const imageData = await getRandomImage();//Random Image를 받아온다
-        const slicedImageData = imageData.slice(0, 20);//10 개만
+        const slicedImageData = imageData.slice(0, 20);//20 개만
 
         container.innerHTML = '';//container의 내용을 비운다
         totalCount = 0;//총 페이지 번호를 0으로 초기화한다
