@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "nodemailer": "^6.9.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.7",
+    "@types/uuid": "^9.0.1"
+  }
+}

@@ -4,5 +4,6 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/homework3/NestJS/project1" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/homework3/NestJS/project1/book-nestjs-backend" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/homework4/pre_homework/pre_homework2/my-project" vcs="Git" />
   </component>
 </project>
