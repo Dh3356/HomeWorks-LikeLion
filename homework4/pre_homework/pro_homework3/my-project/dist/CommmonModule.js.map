@@ -1,0 +1,1 @@
+{"version":3,"file":"CommmonModule.js","sourceRoot":"","sources":["../src/CommmonModule.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAA8C;AAC9C,mDAAgD;AAMzC,IAAM,YAAY,GAAlB,MAAM,YAAY;CAAG,CAAA;AAAf,YAAY;IALxB,IAAA,eAAM,GAAE;IACR,IAAA,eAAM,EAAC;QACJ,SAAS,EAAE,CAAC,6BAAa,CAAC;QAC1B,OAAO,EAAE,CAAC,6BAAa,CAAC;KAC3B,CAAC;GACW,YAAY,CAAG;AAAf,oCAAY"}
