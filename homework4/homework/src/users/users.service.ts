@@ -54,4 +54,8 @@ export class UsersService {
     this.users = this.users.filter((u) => u !== user);
     return this.users;
   }
+
+  isExist(id: string){
+    return !!this.users.find((user) => user.userId === id);
+  }
 }

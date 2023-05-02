@@ -30,7 +30,7 @@ export class PostsService {
   }
 
   findOne(id: number) {
-    const post = this.posts.find((post) => post.id === id);
+    const post = this.posts.find((post) => post.id == id);
     if(!post)
     {
       throw new NotFoundException("Post Not Exist");
@@ -38,9 +38,12 @@ export class PostsService {
     return post;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto, writerId: string) {
+  update(id: number, updatePostDto: UpdatePostDto, userId: string) {
+    if(!this.usersService.isExist(userId)){
+      throw new NotFoundException("User Not Exist");
+    }
     const post = this.findOne(id);
-    if(!this.isAuthorized(post, writerId)){
+    if(!this.isAuthorized(post, userId)){
       throw new UnauthorizedException("권한이 없습니다.");
     }
     const {content} = updatePostDto;
@@ -51,9 +54,12 @@ export class PostsService {
     return this.posts;
   }
 
-  remove(id: number, writerId: string) {
+  remove(id: number, userId: string) {
+    if(!this.usersService.isExist(userId)){
+      throw new NotFoundException("User Not Exist");
+    }
     const post = this.findOne(id);
-    if(!this.isAuthorized(post, writerId)){
+    if(!this.isAuthorized(post, userId)){
       throw new UnauthorizedException("권한이 없습니다.");
     }
     this.posts = this.posts.filter((p) => p !== post);
