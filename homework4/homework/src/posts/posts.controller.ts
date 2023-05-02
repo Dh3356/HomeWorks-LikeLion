@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Headers } from '@nes
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import {CreateUserDto} from "../users/dto/create-user.dto";
 
 @Controller('posts')
 export class PostsController {
@@ -21,17 +20,17 @@ export class PostsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.postsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  @Patch('updateOne/:id')
+  update(@Param('id') id: number, @Body() updatePostDto: UpdatePostDto, @Headers('writerId') writerId: string) {
+    return this.postsService.update(id, updatePostDto, writerId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+  remove(@Param('id') id: number, @Headers('writerId') writerId: string) {
+    return this.postsService.remove(id, writerId);
   }
 }

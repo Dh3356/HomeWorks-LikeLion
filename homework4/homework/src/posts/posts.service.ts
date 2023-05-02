@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
+import {ConflictException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import {Post} from "./posts.model";
@@ -7,24 +7,60 @@ import {UsersService} from "../users/users.service";
 @Injectable()
 export class PostsService {
   private posts: Post[] = [];
+  private id: number = 1;
   constructor(private readonly usersService: UsersService) {}
   create(createPostDto: CreatePostDto, userId: string) {
-    return this.usersService.findAll();//유저 정보가 제대로 있는지 테스트
+    if(!userId){
+      throw new ConflictException("로그인되어있지 않습니다.");
+    }
+    const user = this.usersService.findOne(userId);
+    const newPost:Post = {
+      id: this.id++,
+      writerId: user.userId,
+      content: createPostDto.content,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+    this.posts.push(newPost);
+    return newPost;
   }
 
   findAll() {
-    return this.usersService.findAll();//유저 정보가 제대로 있는지 테스트
+    return this.posts;
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} post`;
+    const post = this.posts.find((post) => post.id === id);
+    if(!post)
+    {
+      throw new NotFoundException("Post Not Exist");
+    }
+    return post;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  update(id: number, updatePostDto: UpdatePostDto, writerId: string) {
+    const post = this.findOne(id);
+    if(!this.isAuthorized(post, writerId)){
+      throw new UnauthorizedException("권한이 없습니다.");
+    }
+    const {content} = updatePostDto;
+    post.content = content;
+    post.updatedAt = new Date();
+    this.posts = this.posts.filter((p) => p !== post);
+    this.posts.push(post);
+    return this.posts;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  remove(id: number, writerId: string) {
+    const post = this.findOne(id);
+    if(!this.isAuthorized(post, writerId)){
+      throw new UnauthorizedException("권한이 없습니다.");
+    }
+    this.posts = this.posts.filter((p) => p !== post);
+    return this.posts;
+  }
+
+  isAuthorized(post: Post, writerId: string){
+    return post.writerId === writerId;
   }
 }

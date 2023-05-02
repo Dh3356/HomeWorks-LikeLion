@@ -1,4 +1,3 @@
 export class UpdatePostDto{
-    writerId: string;
-    writerName: string;
+    content: string;
 }
