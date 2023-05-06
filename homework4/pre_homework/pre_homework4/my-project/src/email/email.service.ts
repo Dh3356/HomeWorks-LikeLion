@@ -14,10 +14,10 @@ export class EmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
             service: 'Gmail',
-            auth: {
-                user: 
-                pass: 
-            }
+            //auth: {
+            //    user:
+            //    pass:
+            //}
         });
     }
 
