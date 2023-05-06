@@ -19,18 +19,18 @@ export class PostsController {
     return this.postsService.findAll();
   }
 
-  @Get(':id')
+  @Get('/:id')
   findOne(@Param('id') id: number) {
     return this.postsService.findOne(id);
   }
 
   @Patch('updateOne/:id')
-  update(@Param('id') id: number, @Body() updatePostDto: UpdatePostDto, @Headers('writerId') writerId: string) {
-    return this.postsService.update(id, updatePostDto, writerId);
+  update(@Param('id') id: number, @Body() updatePostDto: UpdatePostDto, @Headers('userId') userId: string) {
+    return this.postsService.update(id, updatePostDto, userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number, @Headers('writerId') writerId: string) {
-    return this.postsService.remove(id, writerId);
+  remove(@Param('id') id: number, @Headers('userId') userId: string) {
+    return this.postsService.remove(id, userId);
   }
 }
