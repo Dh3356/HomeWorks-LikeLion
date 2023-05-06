@@ -15,8 +15,8 @@ export class EmailService {
         this.transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: 'daehyeon3351@gmail.com',
-                pass: 'ycschcflagzkmmab'
+                user: 
+                pass: 
             }
         });
     }
