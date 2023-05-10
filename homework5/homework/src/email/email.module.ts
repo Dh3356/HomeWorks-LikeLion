@@ -1,9 +1,21 @@
 import { Module } from '@nestjs/common';
 import { EmailService } from './email.service';
-import { EmailController } from './email.controller';
-
+import { ConfigModule } from '@nestjs/config';
+import emailConfig from "./emailConfig/emailConfig";
+import { SendGridModule } from '@anchan828/nest-sendgrid';
 @Module({
-  controllers: [EmailController],
-  providers: [EmailService]
+  imports: [
+    ConfigModule.forRoot({
+      load: [emailConfig],
+    }),
+    SendGridModule.forRoot({
+      apikey: process.env.SENDGRID_API_KEY,
+    }),
+  ],
+  providers: [EmailService],
+  exports: [EmailService],
 })
 export class EmailModule {}
+
+
+

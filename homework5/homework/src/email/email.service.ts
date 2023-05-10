@@ -1,26 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEmailDto } from './dto/create-email.dto';
-import { UpdateEmailDto } from './dto/update-email.dto';
+import { SendGridService } from '@anchan828/nest-sendgrid';
 
 @Injectable()
 export class EmailService {
-  create(createEmailDto: CreateEmailDto) {
-    return 'This action adds a new email';
-  }
+  constructor(private readonly sendGrid: SendGridService) {}
 
-  findAll() {
-    return `This action returns all email`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} email`;
-  }
-
-  update(id: number, updateEmailDto: UpdateEmailDto) {
-    return `This action updates a #${id} email`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} email`;
+  async send(email: string) {
+    const mail = {
+      to: email,
+      subject: 'Hello from sendgrid',
+      from: 'mju@likelion.org',
+      text: 'Hello',
+      html: '<h1>Hello<h1>',
+    };
+    const transport = await this.sendGrid.send(mail);
+    console.log(`E-Mail sent to ${mail.to}`);
+    return transport;
   }
 }
