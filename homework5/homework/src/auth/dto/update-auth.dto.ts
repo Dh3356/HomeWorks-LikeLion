@@ -2,7 +2,7 @@ import { IsEmail, IsString, Matches, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { BadRequestException } from '@nestjs/common';
 
-export class CreateUserDto {
+export class UpdateAuthDto {
   @IsString()
   @Matches(/^[A-Za-z]{2,15}$/)
   readonly userId: string;

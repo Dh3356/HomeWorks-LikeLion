@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { EmailService } from './email.service';
 import { ConfigModule } from '@nestjs/config';
-import emailConfig from "./emailConfig/emailConfig";
+import emailConfig from '../config/emailConfig';
 import { SendGridModule } from '@anchan828/nest-sendgrid';
 @Module({
   imports: [
@@ -16,6 +16,3 @@ import { SendGridModule } from '@anchan828/nest-sendgrid';
   exports: [EmailService],
 })
 export class EmailModule {}
-
-
-

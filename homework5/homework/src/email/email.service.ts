@@ -6,7 +6,6 @@ export class EmailService {
   constructor(private readonly sendGrid: SendGridService) {}
 
   async send(email: string) {
-    console.log('dsfadfasdfasdf');
     const mail = {
       to: email,
       subject: 'Hello from sendgrid',
