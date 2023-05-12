@@ -14,8 +14,7 @@ let EmailModule = class EmailModule {
 EmailModule = __decorate([
     (0, common_1.Module)({
         providers: [email_service_1.EmailService],
-        exports: [email_service_1.EmailService
-        ]
+        exports: [email_service_1.EmailService],
     })
 ], EmailModule);
 exports.EmailModule = EmailModule;
