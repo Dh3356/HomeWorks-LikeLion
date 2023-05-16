@@ -30,36 +30,36 @@ export class PostsController {
     return this.postsService.findAll();
   }
 
-  @Get('/:id')
-  findOne(@Param('id') id: number) {
-    return this.postsService.findOne(id);
+  @Get('/:postId')
+  findOne(@Param('postId') postId: string) {
+    return this.postsService.findOne(postId);
   }
 
-  @Patch('/like/:id')
-  like(@Headers('userId') userId: string, @Param('id') id: number) {
-    return this.postsService.like(userId, id);
-  }
+  //@Patch('/like/:id')
+  //like(@Headers('userId') userId: string, @Param('id') id: number) {
+  //  return this.postsService.like(userId, id);
+  //}
 
-  @Patch('comment/:id')
-  comment(
-    @Headers('userId') userId: string,
-    @Param('id') id: number,
-    @Body() commentPostDto: CommentPostDto,
-  ) {
-    return this.postsService.comment(userId, id, commentPostDto);
-  }
+  //@Patch('comment/:id')
+  //comment(
+  //  @Headers('userId') userId: string,
+  //  @Param('id') id: number,
+  //  @Body() commentPostDto: CommentPostDto,
+  //) {
+  //  return this.postsService.comment(userId, id, commentPostDto);
+  //}
 
-  @Patch('updateOne/:id')
+  @Patch('updateOne/:postId')
   update(
-    @Param('id') id: number,
+    @Param('postId') postId: string,
     @Body() updatePostDto: UpdatePostDto,
     @Headers('userId') userId: string,
   ) {
-    return this.postsService.update(id, updatePostDto, userId);
+    return this.postsService.update(postId, updatePostDto, userId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: number, @Headers('userId') userId: string) {
-    return this.postsService.remove(id, userId);
+  @Delete(':postId')
+  remove(@Param('postId') postId: string, @Headers('userId') userId: string) {
+    return this.postsService.remove(postId, userId);
   }
 }

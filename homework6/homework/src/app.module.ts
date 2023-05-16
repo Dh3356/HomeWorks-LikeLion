@@ -8,6 +8,7 @@ import * as process from 'process';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // import { UserEntity } from '../entity/user.entity';
 import { UserEntity } from './users/entities/user.entity';
+import {PostEntity} from "./posts/entities/post.entity";
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { UserEntity } from './users/entities/user.entity';
       username: process.env.DATATBASE_USERNAME,
       password: process.env.DATATBASE_PASSWORD,
       database: 'user',
-      autoLoadEntities: true,
+      entities: [UserEntity, PostEntity],
       synchronize: false,
     }),
     PostsModule,

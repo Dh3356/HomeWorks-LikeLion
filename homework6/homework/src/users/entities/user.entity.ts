@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {Column, Entity, OneToMany, PrimaryColumn} from 'typeorm';
+import {PostEntity} from "../../posts/entities/post.entity";
 @Entity('User')
 export class UserEntity {
   @PrimaryColumn()
@@ -12,4 +13,16 @@ export class UserEntity {
 
   @Column({ length: 30 })
   password: string;
+
+  @Column({ type: 'timestamp'})
+  createdAt: Date;
+
+  @Column({type: 'timestamp'})
+  updatedAt: Date;
+
+  @OneToMany(
+      (type) => PostEntity,
+      (post) => post.user,
+  )
+  posts: PostEntity[];
 }
