@@ -16,10 +16,6 @@ let EmailService = class EmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
             service: 'Gmail',
-            auth: {
-                user: 'daehyeon3351@gmail.com',
-                pass: 'ycschcflagzkmmab'
-            }
         });
     }
     async sendMemberJoinVerification(emailAddress, signupVerifyToken) {
@@ -28,7 +24,7 @@ let EmailService = class EmailService {
         const mailOptions = {
             to: emailAddress,
             subject: '가입 인증 메일',
-            html: `가입확인 버튼을 누르시면 가입 인증이 완료됩니다.<br/><form action=${url} method="POST"><button>가입확인</button></form>`
+            html: `가입확인 버튼을 누르시면 가입 인증이 완료됩니다.<br/><form action=${url} method="POST"><button>가입확인</button></form>`,
         };
         return await this.transporter.sendMail(mailOptions);
     }
