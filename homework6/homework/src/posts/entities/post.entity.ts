@@ -1,5 +1,6 @@
-import {Column, Entity, ManyToOne, PrimaryColumn} from 'typeorm';
+import {Column, Entity, ManyToOne, OneToMany, PrimaryColumn} from 'typeorm';
 import {UserEntity} from "../../users/entities/user.entity";
+import {CommentEntity} from "../../comment/entities/comment.entity";
 
 @Entity("Post")
 export class PostEntity {
@@ -17,4 +18,10 @@ export class PostEntity {
 
     @Column({type: 'timestamp'})
     updatedAt: Date;
+
+    @OneToMany(
+        (type) => CommentEntity,
+        (comment) => comment.post,
+    )
+    comments: CommentEntity[];
 }

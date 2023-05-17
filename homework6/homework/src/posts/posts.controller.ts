@@ -12,6 +12,7 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CommentPostDto } from './dto/comment-post.dto';
+import {CreateCommentDto} from "../comment/dto/create-comment.dto";
 
 @Controller('posts')
 export class PostsController {
@@ -48,6 +49,18 @@ export class PostsController {
   //) {
   //  return this.postsService.comment(userId, id, commentPostDto);
   //}
+
+  @Post('/:postId/comments')
+  createComment(@Param('postId') postId: string, @Body()createCommentDto: CreateCommentDto, @Headers('userId') userId: string){
+    return this.postsService.createComment(postId, createCommentDto, userId);
+  }
+
+  @Delete('/:postId/comments/:commentId')
+  deleteComment(@Param('postId') postId: string, @Param('commentId') commentId: string, @Headers('userId') userId: string)
+  {
+    return this.postsService.deleteComment(postId, commentId, userId);
+  }
+
 
   @Patch('updateOne/:postId')
   update(

@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // import { UserEntity } from '../entity/user.entity';
 import { UserEntity } from './users/entities/user.entity';
 import {PostEntity} from "./posts/entities/post.entity";
+import { CommentModule } from './comment/comment.module';
+import {CommentEntity} from "./comment/entities/comment.entity";
 
 @Module({
   imports: [
@@ -20,13 +22,14 @@ import {PostEntity} from "./posts/entities/post.entity";
       username: process.env.DATATBASE_USERNAME,
       password: process.env.DATATBASE_PASSWORD,
       database: 'user',
-      entities: [UserEntity, PostEntity],
+      entities: [UserEntity, PostEntity, CommentEntity],
       synchronize: false,
     }),
     PostsModule,
     UsersModule,
     EmailModule,
     AuthModule,
+      CommentModule
   ],
   controllers: [],
   providers: [],

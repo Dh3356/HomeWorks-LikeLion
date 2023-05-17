@@ -9,21 +9,22 @@ import {
 } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Post } from './posts.model';
 import { UsersService } from '../users/users.service';
-import { CommentPostDto } from './dto/comment-post.dto';
-import {Repository} from "typeorm";
-import {PostEntity} from "./entities/post.entity";
-import {InjectRepository} from "@nestjs/typeorm";
+import { Repository } from 'typeorm';
+import { PostEntity } from './entities/post.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CommentService } from '../comment/comment.service';
+import { CreateCommentDto } from '../comment/dto/create-comment.dto';
+import * as uuid from 'uuid';
 
 @Injectable()
 export class PostsService {
-  private id: string = "1";
   constructor(
+    private readonly commentService: CommentService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     @InjectRepository(PostEntity)
-    private postRepository: Repository<PostEntity>
+    private postRepository: Repository<PostEntity>,
   ) {}
   async create(createPostDto: CreatePostDto, userId: string) {
     if (!userId) {
@@ -31,23 +32,24 @@ export class PostsService {
     }
     const user = await this.usersService.findOne(userId);
     const newPost: PostEntity = new PostEntity();
-    newPost.id= "aaaaa";
+    newPost.id = uuid.v1();
     newPost.user = user;
-    newPost.content= createPostDto.content;
-    newPost.createdAt= new Date();
-    newPost.updatedAt= new Date();
+    newPost.content = createPostDto.content;
+    newPost.createdAt = new Date();
+    newPost.updatedAt = new Date();
     await this.postRepository.save(newPost);
     return newPost;
   }
 
   async findAll() {
-    return await this.postRepository.query("SELECT * FROM post")
+    return await this.postRepository.query('SELECT * FROM post');
   }
 
   async findOne(postId: string) {
-    const postData = await this.postRepository.createQueryBuilder()
-        .where("id = :postId", { postId: postId })
-        .getOne();
+    const postData = await this.postRepository
+      .createQueryBuilder()
+      .where('id = :postId', { postId: postId })
+      .getOne();
     if (!postData) {
       throw new NotFoundException('Post Not Exist');
     }
@@ -61,11 +63,12 @@ export class PostsService {
       throw new UnauthorizedException('권한이 없습니다.');
     }
     const { content } = updatePostDto;
-    await this.postRepository.createQueryBuilder()
-        .delete()
-        .from("post")
-        .where("id = :postId", { postId: postId })
-        .execute();
+    await this.postRepository
+      .createQueryBuilder()
+      .delete()
+      .from('post')
+      .where('id = :postId', { postId: postId })
+      .execute();
     post.content = content;
     post.updatedAt = new Date();
     await this.postRepository.save(post);
@@ -76,10 +79,30 @@ export class PostsService {
     if (user.id !== userId) {
       throw new UnauthorizedException('권한이 없습니다.');
     }
-    await this.postRepository.createQueryBuilder()
-        .delete()
-        .from("post")
-        .where("id = :postId", { postId: postId })
-        .execute();
+    await this.postRepository
+      .createQueryBuilder()
+      .delete()
+      .from('post')
+      .where('id = :postId', { postId: postId })
+      .execute();
+  }
+
+  async createComment(
+    postId: string,
+    createCommentDto: CreateCommentDto,
+    userId: string,
+  ) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    await this.commentService.create(post, createCommentDto, user);
+  }
+
+  async deleteComment(postId: string, commentId: string, userId: string) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    if (user.id !== userId) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
+    await this.commentService.remove(post, commentId, user);
   }
 }
