@@ -1,9 +1,7 @@
 import {
-  ConflictException,
   forwardRef,
   Inject,
   Injectable,
-  NotAcceptableException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -16,11 +14,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CommentService } from '../comment/comment.service';
 import { CreateCommentDto } from '../comment/dto/create-comment.dto';
 import * as uuid from 'uuid';
+import { LikeService } from '../like/like.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     private readonly commentService: CommentService,
+    private readonly likeService: LikeService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     @InjectRepository(PostEntity)
@@ -104,5 +104,17 @@ export class PostsService {
       throw new UnauthorizedException('권한이 없습니다.');
     }
     await this.commentService.remove(post, commentId, user);
+  }
+
+  async likePost(postId: string, userId: string) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    await this.likeService.create(post, user);
+  }
+
+  async unLikePost(postId, userId) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    await this.likeService.remove(post, user);
   }
 }

@@ -7,7 +7,8 @@ import {
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { EmailService } from '../email/email.service';
 import { UsersService } from '../users/users.service';
-import {User} from "../users/users.models";
+import { User } from '../users/users.models';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,9 +23,9 @@ export class AuthService {
   }
 
   //회원가입 기능
-  async regist(createAuthDto: CreateAuthDto) {
+  async regist(createUserDto: CreateUserDto) {
     //유저에서 만들기
-    const { userId, userPw, userName, userEmail } = createAuthDto;
+    const { userId, userPw, userName, userEmail } = createUserDto;
     const user: User = {
       userId: userId,
       userPw: userPw,
