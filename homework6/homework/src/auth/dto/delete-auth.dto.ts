@@ -1,4 +1,4 @@
-export class WithdrawAuthDto {
+export class DeleteAuthDto {
   userId: string;
   userPw: string;
 }

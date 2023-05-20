@@ -1,102 +1,120 @@
 import {
-  ConflictException,
   forwardRef,
   Inject,
   Injectable,
-  NotAcceptableException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Post } from './posts.model';
 import { UsersService } from '../users/users.service';
-import { CommentPostDto } from './dto/comment-post.dto';
+import { Repository } from 'typeorm';
+import { PostEntity } from './entities/post.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CommentService } from '../comment/comment.service';
+import { CreateCommentDto } from '../comment/dto/create-comment.dto';
+import * as uuid from 'uuid';
+import { LikeService } from '../like/like.service';
 
 @Injectable()
 export class PostsService {
-  private posts: Post[] = [];
-  private id: number = 1;
   constructor(
+    private readonly commentService: CommentService,
+    private readonly likeService: LikeService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+    @InjectRepository(PostEntity)
+    private postRepository: Repository<PostEntity>,
   ) {}
-  create(createPostDto: CreatePostDto, userId: string) {
+  async create(createPostDto: CreatePostDto, userId: string) {
     if (!userId) {
-      throw new ConflictException('로그인되어있지 않습니다.');
+      throw new UnauthorizedException('로그인되어있지 않습니다.');
     }
-    const user = this.usersService.findOne(userId);
-    const newPost: Post = {
-      id: this.id++,
-      writerId: user.userId,
-      content: createPostDto.content,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      likes: 0,
-      comments: [],
-    };
-    this.posts.push(newPost);
+    const user = await this.usersService.findOne(userId);
+    const newPost: PostEntity = new PostEntity();
+    newPost.id = uuid.v1();
+    newPost.user = user;
+    newPost.content = createPostDto.content;
+    newPost.createdAt = new Date();
+    newPost.updatedAt = new Date();
+    await this.postRepository.save(newPost);
     return newPost;
   }
 
-  findAll() {
-    return this.posts;
+  async findAll() {
+    return await this.postRepository.query('SELECT * FROM post');
   }
 
-  findOne(id: number) {
-    const post = this.posts.find((post) => post.id === id);
-    if (!post) {
+  async findOne(postId: string) {
+    const postData = await this.postRepository
+      .createQueryBuilder()
+      .where('id = :postId', { postId: postId })
+      .getOne();
+    if (!postData) {
       throw new NotFoundException('Post Not Exist');
     }
-    return post;
+    return postData;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto, userId: string) {
-    this.usersService.findOne(userId);
-    const post = this.findOne(id);
-    if (!this.isAuthorized(post, userId)) {
+  async update(postId: string, updatePostDto: UpdatePostDto, userId: string) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    if (user.id !== userId) {
       throw new UnauthorizedException('권한이 없습니다.');
     }
     const { content } = updatePostDto;
-    this.posts = this.posts.filter((p) => p !== post);
+    await this.postRepository
+      .createQueryBuilder()
+      .delete()
+      .from('post')
+      .where('id = :postId', { postId: postId })
+      .execute();
     post.content = content;
     post.updatedAt = new Date();
-    this.posts.push(post);
-    return this.posts;
+    await this.postRepository.save(post);
   }
-
-  like(userId: string, id: number) {
-    const post = this.findOne(id);
-    this.usersService.updateLike(userId, id);
-    this.posts = this.posts.filter((p) => p !== post);
-    post.likes++;
-    this.posts.push(post);
-  }
-
-  comment(userId: string, id: number, commentPostDto: CommentPostDto) {
-    const post = this.findOne(id);
-    this.posts = this.posts.filter((post) => post !== post);
-    post.comments.push({
-      writerId: userId,
-      contents: commentPostDto.comment,
-      writeAt: new Date(),
-    });
-    this.posts.push(post);
-  }
-
-  remove(id: number, userId: string) {
-    if (!this.usersService.isExist(userId)) {
-      throw new NotFoundException('User Not Exist');
-    }
-    const post = this.findOne(id);
-    if (!this.isAuthorized(post, userId)) {
+  async remove(postId: string, userId: string) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    if (user.id !== userId) {
       throw new UnauthorizedException('권한이 없습니다.');
     }
-    this.posts = this.posts.filter((p) => p !== post);
-    return this.posts;
+    await this.postRepository
+      .createQueryBuilder()
+      .delete()
+      .from('post')
+      .where('id = :postId', { postId: postId })
+      .execute();
   }
 
-  isAuthorized(post: Post, writerId: string) {
-    return post.writerId === writerId;
+  async createComment(
+    postId: string,
+    createCommentDto: CreateCommentDto,
+    userId: string,
+  ) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    await this.commentService.create(post, createCommentDto, user);
+  }
+
+  async deleteComment(postId: string, commentId: string, userId: string) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    if (user.id !== userId) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
+    await this.commentService.remove(post, commentId, user);
+  }
+
+  async likePost(postId: string, userId: string) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    await this.likeService.create(post, user);
+  }
+
+  async unLikePost(postId, userId) {
+    const user = await this.usersService.findOne(userId);
+    const post = await this.findOne(postId);
+    await this.likeService.remove(post, user);
   }
 }

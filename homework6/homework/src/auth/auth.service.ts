@@ -3,16 +3,12 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  NotAcceptableException,
-  NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { EmailService } from '../email/email.service';
-import { User } from '../users/users.models';
 import { UsersService } from '../users/users.service';
-import { CheckAuthDto } from './dto/check-auth.dto';
-import { WithdrawAuthDto } from './dto/withdraw-auth.dto';
+import { User } from '../users/users.models';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,24 +23,25 @@ export class AuthService {
   }
 
   //회원가입 기능
-  async regist(createAuthDto: CreateAuthDto) {
+  async regist(createUserDto: CreateUserDto) {
     //유저에서 만들기
-    const { userId, userPw, userName, userEmail } = createAuthDto;
-    const user = {
+    const { userId, userPw, userName, userEmail } = createUserDto;
+    const user: User = {
       userId: userId,
       userPw: userPw,
       userName: userName,
       userEmail: userEmail,
-      likesPostIds: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
-    this.usersService.create(user);
+    await this.usersService.create(user);
   }
 
-  delete(userId: string) {
-    this.usersService.remove(userId);
+  async delete(userId: string) {
+    await this.usersService.remove(userId);
   }
 
-  logIn(userId: string) {
-    return this.usersService.findOne(userId);
+  async logIn(userId: string) {
+    return await this.usersService.findOne(userId);
   }
 }

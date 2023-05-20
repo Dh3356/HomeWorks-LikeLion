@@ -3,5 +3,6 @@ export interface User {
   userPw: string;
   userName: string;
   userEmail: string;
-  likesPostIds: number[];
+  createdAt: Date;
+  updatedAt: Date;
 }

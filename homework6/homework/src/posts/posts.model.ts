@@ -1,4 +1,4 @@
-import { Comment } from './comments.modle';
+import { Comment } from './comments.model';
 
 export interface Post {
   id: number;
@@ -6,6 +6,4 @@ export interface Post {
   content: string;
   createdAt: Date;
   updatedAt: Date;
-  likes: number;
-  comments: Comment[];
 }

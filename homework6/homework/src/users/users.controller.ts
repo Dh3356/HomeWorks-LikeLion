@@ -6,7 +6,7 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Delete, ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -28,7 +28,7 @@ export class UsersController {
   @Patch('/:userId')
   update(
     @Param('userId') userId: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(userId, updateUserDto);
   }

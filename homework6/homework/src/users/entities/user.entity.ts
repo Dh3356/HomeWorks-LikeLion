@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { PostEntity } from '../../posts/entities/post.entity';
+import { CommentEntity } from '../../comment/entities/comment.entity';
+import { LikeEntity } from '../../like/entities/like.entity';
 @Entity('User')
 export class UserEntity {
   @PrimaryColumn()
@@ -12,4 +15,19 @@ export class UserEntity {
 
   @Column({ length: 30 })
   password: string;
+
+  @Column({ type: 'timestamp' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamp' })
+  updatedAt: Date;
+
+  @OneToMany((type) => PostEntity, (post) => post.user)
+  posts: PostEntity[];
+
+  @OneToMany((type) => CommentEntity, (comment) => comment.user)
+  comments: CommentEntity[];
+
+  @OneToMany((type) => LikeEntity, (like) => like.user)
+  likes: LikeEntity[];
 }
