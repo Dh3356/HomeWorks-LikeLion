@@ -10,22 +10,27 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const users_module_1 = require("./users/users.module");
 const email_module_1 = require("./email/email.module");
-const process_1 = require("process");
 const typeorm_1 = require("@nestjs/typeorm");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [users_module_1.UsersModule, email_module_1.EmailModule, typeorm_1.TypeOrmModule.forRoot({
+        imports: [
+            users_module_1.UsersModule,
+            email_module_1.EmailModule,
+            config_1.ConfigModule.forRoot(),
+            typeorm_1.TypeOrmModule.forRoot({
                 type: 'mysql',
-                host: process_1.default.env.DATABASE_HOST,
+                host: process.env.DATABASE_HOST,
                 port: 3306,
-                username: process_1.default.env.DATATBASE_USERNAME,
-                password: process_1.default.env.DATATBASE_PASSWORD,
+                username: process.env.DATABASE_USERNAME,
+                password: process.env.DATABASE_PASSWORD,
                 database: 'user',
                 entities: [__dirname + '/**/*.entity{.ts, .js'],
-                synchronize: process_1.default.env.DATATBASE_SYNCHRONIZE === 'true',
-            }),],
+                synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
+            }),
+        ],
         controllers: [],
         providers: [],
     })
