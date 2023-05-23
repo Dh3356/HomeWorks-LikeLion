@@ -18,7 +18,7 @@ export class AuthController {
   }
 
   @Post('/login')
-  logIn(@Headers('userId') userId: string) {
-    return this.authService.logIn(userId);
+  logIn(@Headers('userId') userId: string, @Headers('userPw') userPw: string) {
+    return this.authService.logIn(userId, userPw);
   }
 }

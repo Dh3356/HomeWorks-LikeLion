@@ -6,22 +6,27 @@ import {
   Body,
   Patch,
   Param,
-  Delete, ValidationPipe,
+    Headers,
+  Delete, ValidationPipe, Head,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {AuthService} from "../auth/auth.service";
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
 
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Get('/:userid')
-  findOne(@Param('userid') userId: string) {
+  @Get(':userId')
+  async findOne(@Headers() headers: any,  @Param('userId')userId: string):Promise<any>{
+    const jwtString = headers.authorization.split('Bearer ')[1];
+    console.log(jwtString);
+    this.authService.verify(jwtString);
     return this.usersService.findOne(userId);
   }
 

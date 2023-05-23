@@ -1,18 +1,20 @@
 import {
-  ConflictException,
   forwardRef,
   Inject,
-  Injectable,
+  Injectable, UnauthorizedException,
 } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import * as jwt from 'jsonwebtoken';
 import { EmailService } from '../email/email.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/users.models';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import authConfig from "../config/authConfig";
+import {ConfigType} from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
   constructor(
+      @Inject(authConfig.KEY) private config: ConfigType<typeof authConfig>,
     private readonly emailService: EmailService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
@@ -41,7 +43,28 @@ export class AuthService {
     await this.usersService.remove(userId);
   }
 
-  async logIn(userId: string) {
-    return await this.usersService.findOne(userId);
+  async logIn(userId: string, userPw: string) {
+    const payload = {userId, userPw};
+    return jwt.sign(payload, this.config.jwtSecret, {
+      expiresIn: '1d',
+      audience: 'example.com',
+      issuer: 'example.com'
+    });
+  };
+
+  verify(jwtString: string){
+    try{
+      const payload = jwt.verify(jwtString, this.config.jwtSecret) as (jwt.JwtPayload | string) & {userId: string, userPw: string };
+      const {userId, userPw} = payload;
+
+      return{
+        userId: userId,
+        userPw: userPw
+      };
+    }
+    catch(e){
+      throw new UnauthorizedException();
+    }
+
   }
 }
