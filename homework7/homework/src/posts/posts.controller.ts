@@ -6,23 +6,25 @@ import {
   Patch,
   Param,
   Delete,
-  Headers,
+  Headers, Inject, InternalServerErrorException,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { CommentPostDto } from './dto/comment-post.dto';
 import { CreateCommentDto } from '../comment/dto/create-comment.dto';
+import {WINSTON_MODULE_NEST_PROVIDER} from "nest-winston";
+import {Logger as WinstonLogger} from "winston";
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(private readonly postsService: PostsService, @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: WinstonLogger) {}
 
   @Post()
   create(
     @Body() createPostDto: CreatePostDto,
     @Headers('userId') userId: string,
   ) {
+    this.printWinstonLog(userId);
     return this.postsService.create(createPostDto, userId);
   }
 
@@ -56,6 +58,7 @@ export class PostsController {
     @Body() createCommentDto: CreateCommentDto,
     @Headers('userId') userId: string,
   ) {
+    this.printWinstonLog(postId, userId, createCommentDto);
     return this.postsService.createComment(postId, createCommentDto, userId);
   }
 
@@ -65,11 +68,13 @@ export class PostsController {
     @Param('commentId') commentId: string,
     @Headers('userId') userId: string,
   ) {
+    this.printWinstonLog(postId, userId, commentId);
     return this.postsService.deleteComment(postId, commentId, userId);
   }
 
   @Post('/:postId/likes')
   likePost(@Param('postId') postId: string, @Headers('userId') userId: string) {
+    this.printWinstonLog(postId, userId);
     return this.postsService.likePost(postId, userId);
   }
 
@@ -78,6 +83,7 @@ export class PostsController {
     @Param('postId') postId: string,
     @Headers('userId') userId: string,
   ) {
+    this.printWinstonLog(postId, userId);
     return this.postsService.unLikePost(postId, userId);
   }
 
@@ -87,11 +93,25 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
     @Headers('userId') userId: string,
   ) {
+    this.printWinstonLog(postId, userId, updatePostDto);
     return this.postsService.update(postId, updatePostDto, userId);
   }
 
   @Delete(':postId')
   remove(@Param('postId') postId: string, @Headers('userId') userId: string) {
+    this.printWinstonLog(postId, userId);
     return this.postsService.remove(postId, userId);
+  }
+
+  private printWinstonLog(...contents){
+    try{
+      throw new InternalServerErrorException('test');
+    }
+    catch (e){
+      this.logger.error('error: '+ JSON.stringify(contents), e.stack);
+    }
+    this.logger.warn('warn: '+ JSON.stringify(contents));
+    this.logger.verbose('verbose: '+ JSON.stringify(contents));
+    this.logger.debug('debug: '+ JSON.stringify(contents));
   }
 }
