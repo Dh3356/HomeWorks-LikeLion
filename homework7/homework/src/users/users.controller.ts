@@ -25,9 +25,7 @@ export class UsersController {
   @Get(':userId')
   async findOne(@Headers() headers: any,  @Param('userId')userId: string):Promise<any>{
     const jwtString = headers.authorization.split('Bearer ')[1];
-    console.log(jwtString);
-    this.authService.verify(jwtString);
-    return this.usersService.findOne(userId);
+    return this.authService.verify(jwtString, userId);
   }
 
   @Patch('/:userId')

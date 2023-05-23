@@ -10,7 +10,7 @@ import { User } from '../users/users.models';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import authConfig from "../config/authConfig";
 import {ConfigType} from "@nestjs/config";
-
+import {Response} from "express";
 @Injectable()
 export class AuthService {
   constructor(
@@ -43,19 +43,30 @@ export class AuthService {
     await this.usersService.remove(userId);
   }
 
-  async logIn(userId: string, userPw: string) {
+  logIn(userId: string, userPw: string, res: Response) {
     const payload = {userId, userPw};
-    return jwt.sign(payload, this.config.jwtSecret, {
+    const sign = jwt.sign(payload, this.config.JWT_SECRET, {
       expiresIn: '1d',
       audience: 'example.com',
       issuer: 'example.com'
     });
+    res.setHeader('Authorization', 'Bearer '+sign);
+    res.cookie('jwt',sign,{
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 //1 day
+    });
+    return res.send({
+      message: 'success'
+    });
   };
 
-  verify(jwtString: string){
+  verify(jwtString: string, id:string){
     try{
-      const payload = jwt.verify(jwtString, this.config.jwtSecret) as (jwt.JwtPayload | string) & {userId: string, userPw: string };
+      const payload = jwt.verify(jwtString, this.config.JWT_SECRET) as (jwt.JwtPayload | string) & {userId: string, userPw: string };
       const {userId, userPw} = payload;
+      if(id !== userId){
+        throw new UnauthorizedException("You are not that user");
+      }
 
       return{
         userId: userId,
