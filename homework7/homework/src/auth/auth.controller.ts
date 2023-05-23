@@ -21,4 +21,9 @@ export class AuthController {
   logIn(@Headers('userId') userId: string, @Headers('userPw') userPw: string, @Res() res: Response) {
     return this.authService.logIn(userId, userPw, res);
   }
+
+  @Post('/logout')
+  logOut(@Headers('userId') userId: string, @Res() res: Response) {
+    return this.authService.logOut(userId, res);
+  }
 }

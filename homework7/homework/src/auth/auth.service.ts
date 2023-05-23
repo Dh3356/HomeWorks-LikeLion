@@ -56,9 +56,18 @@ export class AuthService {
       maxAge: 24 * 60 * 60 * 1000 //1 day
     });
     return res.send({
-      message: 'success'
+      message: 'logIn'
     });
   };
+
+  logOut(userId: string, res: Response){
+    res.cookie('jwt', '', {
+      maxAge: 0
+    })
+    return res.send({
+      message: 'logOut'
+    })
+  }
 
   verify(jwtString: string, id:string){
     try{
