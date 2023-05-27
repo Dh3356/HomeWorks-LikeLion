@@ -4,7 +4,6 @@ import {
   Injectable,
   NotAcceptableException,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.models';

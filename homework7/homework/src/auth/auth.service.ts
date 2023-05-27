@@ -1,18 +1,20 @@
 import {
-  ConflictException,
   forwardRef,
   Inject,
-  Injectable,
+  Injectable, UnauthorizedException,
 } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import * as jwt from 'jsonwebtoken';
 import { EmailService } from '../email/email.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/users.models';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-
+import authConfig from "../config/authConfig";
+import {ConfigType} from "@nestjs/config";
+import {Response} from "express";
 @Injectable()
 export class AuthService {
   constructor(
+      @Inject(authConfig.KEY) private config: ConfigType<typeof authConfig>,
     private readonly emailService: EmailService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
@@ -41,7 +43,48 @@ export class AuthService {
     await this.usersService.remove(userId);
   }
 
-  async logIn(userId: string) {
-    return await this.usersService.findOne(userId);
+  logIn(userId: string, userPw: string, res: Response) {
+    const payload = {userId, userPw};
+    const sign = jwt.sign(payload, this.config.JWT_SECRET, {
+      expiresIn: '1d',
+      audience: 'example.com',
+      issuer: 'example.com'
+    });
+    res.setHeader('Authorization', 'Bearer '+sign);
+    res.cookie('jwt',sign,{
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 //1 day
+    });
+    return res.send({
+      message: 'logIn'
+    });
+  };
+
+  logOut(userId: string, res: Response){
+    res.cookie('jwt', '', {
+      maxAge: 0
+    })
+    return res.send({
+      message: 'logOut'
+    })
+  }
+
+  verify(jwtString: string, id:string){
+    try{
+      const payload = jwt.verify(jwtString, this.config.JWT_SECRET) as (jwt.JwtPayload | string) & {userId: string, userPw: string };
+      const {userId, userPw} = payload;
+      if(id !== userId){
+        throw new UnauthorizedException("You are not that user");
+      }
+
+      return{
+        userId: userId,
+        userPw: userPw
+      };
+    }
+    catch(e){
+      throw new UnauthorizedException();
+    }
+
   }
 }
