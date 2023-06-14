@@ -15,6 +15,8 @@ import { CommentService } from '../comment/comment.service';
 import { CreateCommentDto } from '../comment/dto/create-comment.dto';
 import * as uuid from 'uuid';
 import { LikeService } from '../like/like.service';
+import * as AWS from 'aws-sdk';
+import * as process from 'process';
 
 @Injectable()
 export class PostsService {
@@ -31,12 +33,38 @@ export class PostsService {
       throw new UnauthorizedException('로그인되어있지 않습니다.');
     }
     const user = await this.usersService.findOne(userId);
-    const newPost: PostEntity = new PostEntity();
+    let newPost: PostEntity = new PostEntity();
     newPost.id = uuid.v1();
     newPost.user = user;
     newPost.content = createPostDto.content;
     newPost.createdAt = new Date();
     newPost.updatedAt = new Date();
+    newPost.fileUrl = null;
+    if (createPostDto.file) {
+      AWS.config.update({
+        region: 'ap-northeast-2',
+        credentials: {
+          accessKeyId: process.env.FILEACCESSKEYID,
+          secretAccessKey: process.env.FILESECRETACCESSKEY,
+        },
+      });
+
+      const upload = new AWS.S3();
+
+      const params = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: createPostDto.file.originalname,
+        Body: createPostDto.file.buffer,
+      };
+      console.log(params);
+      try {
+        const response = await upload.upload(params).promise();
+        newPost.fileUrl = response.Location;
+      } catch (e) {
+        throw new Error(e.stack);
+      }
+    }
+
     await this.postRepository.save(newPost);
     return newPost;
   }
