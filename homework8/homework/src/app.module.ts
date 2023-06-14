@@ -13,8 +13,11 @@ import { CommentModule } from './comment/comment.module';
 import { CommentEntity } from './comment/entities/comment.entity';
 import { LikeModule } from './like/like.module';
 import { LikeEntity } from './like/entities/like.entity';
-import {WinstonModule, utilities as nestWinstonModuleUtilities} from "nest-winston";
-import * as winston from "winston";
+import {
+  WinstonModule,
+  utilities as nestWinstonModuleUtilities,
+} from 'nest-winston';
+import * as winston from 'winston';
 
 @Module({
   imports: [
@@ -22,24 +25,26 @@ import * as winston from "winston";
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DATABASE_HOST,
-      port: 3307,
-      username: process.env.DATATBASE_USERNAME,
-      password: process.env.DATATBASE_PASSWORD,
+      port: 3306,
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
       database: 'user',
       entities: [UserEntity, PostEntity, CommentEntity, LikeEntity],
-      synchronize: false,
+      synchronize: process.env.DATABASE_SYNCHRONIZE == 'true',
     }),
-      WinstonModule.forRoot({
-        transports: [
-            new winston.transports.Console({
-              level: "silly",
-              format: winston.format.combine(
-                  winston.format.timestamp(),
-                  nestWinstonModuleUtilities.format.nestLike('MyApp', {prettyPrint: true}),
-              )
-            })
-        ]
-      }),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          level: 'silly',
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            nestWinstonModuleUtilities.format.nestLike('MyApp', {
+              prettyPrint: true,
+            }),
+          ),
+        }),
+      ],
+    }),
     PostsModule,
     UsersModule,
     EmailModule,
